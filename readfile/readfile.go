@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Readfile(files_name string) []string {
+func ReadFile(files_name string) []string {
 	var str1 []string
 	data, err := ioutil.ReadFile(files_name)
 	if err != nil {

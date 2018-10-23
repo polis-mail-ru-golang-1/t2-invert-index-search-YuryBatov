@@ -6,12 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"./files"
 	"./readfile"
-	"./revers_index"
+	"./reversindex"
 )
 
-func sort2(m files.Allfiles) {
+func sort2(m reversindex.Allfiles) {
 	for i := range m {
 		for j := i; j > 0 && m[j-1].Quantity < m[j].Quantity; j-- {
 			m[j-1], m[j] = m[j], m[j-1]
@@ -20,42 +19,24 @@ func sort2(m files.Allfiles) {
 }
 
 func main() {
-	m := make(map[string]files.Allfiles)
+	m := make(map[string]reversindex.Allfiles)
 	var word string
 	var words []string
-	files_name := make([]string, 0, 10)
-	files_name = os.Args[1:]
+	var filesname []string
+	filesname = os.Args[1:]
 	fmt.Printf("\n%s", "Введите слово: ")
-	for i := range files_name {
-		str1 := readfile.Readfile(files_name[i])
-		m = revers_index.Revers_index(str1, files_name[i], m)
+	for i := range filesname {
+		str1 := readfile.ReadFile(filesname[i])
+		m = reversindex.ReversIndex(str1, filesname[i], m)
 	}
 	buf := bufio.NewScanner(os.Stdin)
 	buf.Scan()
 	word = buf.Text()
 	words = strings.Split(word, " ")
-	var m_1 files.Allfiles
-	var m_11 files.Files
-	for i := range words {
-		l := 0
-		for j := range m[words[i]] {
-			for k := range m_1 {
-				if m[words[i]][j].Name == m_1[k].Name {
-					m_1[k].Quantity = m_1[k].Quantity + m[words[i]][j].Quantity
-					l++
-				}
-			}
-			if l == 0 {
-				m_11.Name = m[words[i]][j].Name
-				m_11.Quantity = m[words[i]][j].Quantity
-				m_1 = append(m_1, m_11)
-			}
-			l = 0
-		}
+	var m1 reversindex.Allfiles
+	m1 = reversindex.Search(words, m, m1)
+	sort2(m1)
+	for i := range m1 {
+		fmt.Printf("%s : %d совпадений\n", m1[i].Name, m1[i].Quantity)
 	}
-	sort2(m_1)
-	for i := range m_1 {
-		fmt.Printf("%s : %d совпадений\n", m_1[i].Name, m_1[i].Quantity)
-	}
-	//m_1 = sort.Ints()
 }
