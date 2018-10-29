@@ -6,6 +6,10 @@ import (
 	"os"
 	"strings"
 
+	//"time"
+
+	//"strings"
+
 	"./readfile"
 	"./reversindex"
 )
@@ -20,14 +24,19 @@ func sort2(m reversindex.Allfiles) {
 
 func main() {
 	m := make(map[string]reversindex.Allfiles)
+	c := make(chan map[string]reversindex.Allfiles)
 	var word string
 	var words []string
 	var filesname []string
 	filesname = os.Args[1:]
 	fmt.Printf("\n%s", "Введите слово: ")
 	for i := range filesname {
-		str1 := readfile.ReadFile(filesname[i])
-		m = reversindex.ReversIndex(str1, filesname[i], m)
+		go func(i int) {
+			str1 := readfile.ReadFile(filesname[i])
+			m = reversindex.ReversIndex(str1, filesname[i], m)
+			c <- m
+		}(i)
+		<-c
 	}
 	buf := bufio.NewScanner(os.Stdin)
 	buf.Scan()
